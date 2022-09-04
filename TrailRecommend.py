@@ -19,15 +19,12 @@ with open ("traildata.txt","r") as traildata:
 def sort2(left,right):
     result = []
     while left and right:
-        
         if left[0][2]<right[0][2]:
             result.append(left[0])
             left.pop(0)
-            
         else:
             result.append(right[0])
             right.pop(0)
-            
     if left:
         result += left
     if right:
@@ -60,10 +57,15 @@ def filter_main():
     print("\ta   by State Park")
     print("\tb   by trail length")
     print("\tc   by trail difficulty\n")
-    filter_list = input("Choose 1 or more categories by typing in the letter(s) and then Enter: ")
+    filter_str = input("Choose 1 or more categories by typing in the letter(s) and then Enter: ")
+    #put in list, get rid of repeats
+    filter_list = list(filter_str)
+    filter_set = set(filter_list)
+    filter_list = list(filter_set)[::-1]
+
     return filter_list
 
-
+#If we haven't started the interest list, add the filtered indexes
 def add_to_list(inside_index,filter_set,interest_list):
     for index in range(len(trail_info)):
         if trail_info[index][inside_index] in filter_set:
@@ -71,13 +73,14 @@ def add_to_list(inside_index,filter_set,interest_list):
     return interest_list
 
 
+#If interest list is already started, take out indexes that don't fit next filter
 def subtract_from_list(inside_index,filter_set,interest_list):
     for index in reversed(interest_list):  
       if trail_info[index][inside_index] not in filter_set:
         interest_list.remove(index)
     return interest_list
 
-
+#If user wants to filter by state park, this chooses park(s) and corrects interest list
 def filter_park(interest_list):
     print("\n")
     print("Possible State Parks:")
@@ -95,7 +98,7 @@ def filter_park(interest_list):
     
     return interest_list
 
-    
+#If user wants to filter by difficulty level, this chooseslevels(s) and corrects interest list  
 def filter_difficulty(interest_list):
     print("\n")
     print("Possible Difficulty Levels:")
@@ -113,6 +116,7 @@ def filter_difficulty(interest_list):
     
     return interest_list
 
+#If user wants to filter by trail length, this chooses max or min length
 def ask_length(maxmin):
     if maxmin == 1:
         adj = "longest"
@@ -125,6 +129,7 @@ def ask_length(maxmin):
         return None
 
 
+#If user wants to filter by trail length, this finds all trails between max and min and corrects interest list
 def filter_length(interest_list):
     max_length = None
     min_length = None
@@ -157,7 +162,7 @@ def filter_length(interest_list):
     return interest_list
 
 
-
+##If user wants to filter by trail length, this finds index of max and min trails
 def length_index(length,start_index = 0, end_index = None):
     if end_index == None:
         end_index = len(trail_info)-1
@@ -174,10 +179,10 @@ def length_index(length,start_index = 0, end_index = None):
     return mid_index
     
 
-
+#Prints results
 def print_list(interest_list):
     if len(interest_list)==0:
-        print("\nThere are no trails that meet your requirements.")
+        print("\n\nThere are no trails that meet your requirements.")
     else:
         if len(interest_list)==1:
             trails = "trail"
@@ -189,12 +194,11 @@ def print_list(interest_list):
             fit = "fit"
             verb = "are"
             s = "s"
-        print(f"\nThere {verb} {len(interest_list)} {trails} that {fit} your requirement{s}:\n")
+        print(f"\n\nThere {verb} {len(interest_list)} {trails} that {fit} your requirement{s}:\n")
         
-
         for index in interest_list:
-          distance = str(trail_info[index][2])
-          print(f"{trail_info[index][0]} Trail at {trail_info[index][1]} is {distance} mile long and is rated as {trail_info[index][3]}.       Look for {trail_info[index][5]}. ")
+          distance1 = str(trail_info[index][2])
+          print(f"{trail_info[index][0]} Trail at {trail_info[index][1]} is {distance1} mile long and is rated as {trail_info[index][3]}.       Look for {trail_info[index][5]}. ")
       
 
 
@@ -205,29 +209,47 @@ def print_list(interest_list):
 
 
 
+all_finished = False
+while not all_finished:
+    print('\n\n/\  _CHOOSE A LOCAL TRAIL_  /\______ ')
+    print('  \/                      \/\n\n')
+    print("We'll list all local trails that fit your requirements.\n")
+    finished = False
+    length_choice = False
+    interest_list = []
+    filter_list = filter_main()
+    while filter_list and not finished:
+        if filter_list[0]=='a':
+            interest_list = filter_park(interest_list)
+            if len(interest_list)==0:
+                finished = True
+        elif filter_list[0]=='b':
+            length_choice = True
+        elif filter_list[0]=='c':
+            interest_list = filter_difficulty(interest_list)
+            if len(interest_list)==0:
+                finished = True
+        filter_list = filter_list[1:]
+            
+    if length_choice:
+        interest_list = filter_length(interest_list)
+
+    print_list(interest_list)
+    print("\n\n")
+    ask = ""
+    while ask!="y" and ask!="n":
+        ask = input("Would you like to search again?  y or n:")
+    if ask == "n":
+        all_finished = True
+
+print("\n\nGood bye!")
 
 
-print('\n\n*****Choose A Local Trail******\n')
-print("We'll list all local trails that fit your requirements.\n")
-finished = False
-length_choice = False
-interest_list = []
-filter_list = filter_main()
-while filter_list and not finished:
-    if filter_list[0]=='a':
-        interest_list = filter_park(interest_list)
-        if len(interest_list)==0:
-            finished = True
-    elif filter_list[0]=='b':
-        length_choice = True
-    elif filter_list[0]=='c':
-        interest_list = filter_difficulty(interest_list)
-        if len(interest_list)==0:
-            finished = True
-    filter_list = filter_list[1:]
-        
-if length_choice:
-    interest_list = filter_length(interest_list)
-
-print_list(interest_list)
-print("")
+#trail_info is a list of lists, each element of first list contains 
+# trail name, park name, trail length, difficulty, trail type, markers
+#state_parks is dictionary mapping letter to Sate Park
+#difficulties is dictionary mapping letter to difficulty level
+#filter_list is list of letters of categories user wants to search by
+#all_finished True when program done
+#finished = True when search done
+#length_choise is True if user filters by length
