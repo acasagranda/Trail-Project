@@ -211,7 +211,7 @@ def print_list(interest_list):
 
 all_finished = False
 while not all_finished:
-    print('\n\n/\  _CHOOSE A LOCAL TRAIL_  /\______ ')
+    print('\n\n/\  _FIND A LOCAL TRAIL_  /\______ ')
     print('  \/                      \/\n\n')
     print("We'll list all local trails that fit your requirements.\n")
     finished = False
