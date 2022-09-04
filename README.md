@@ -1,5 +1,5 @@
 # Trail-Project
-This is a final project for CS101 at Codecademy.  
+This is a final project for CS102 at Codecademy.  
 The project was to write a program using search and sort algorithms that recommended something based on user's input.
 The data was sorted using a merge sort.  Both binary and linear searches were used.
 
